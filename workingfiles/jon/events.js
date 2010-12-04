@@ -116,8 +116,8 @@ ev.prototype = {
     
     return this;
   },
-  fire: function (type) {
-    this.fireEvent(this.el, type);
+  fire: function (type, data) {
+    this.fireEvent(this.el, type, data);
     return this;
   }
 };
