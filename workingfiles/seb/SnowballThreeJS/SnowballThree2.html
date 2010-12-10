@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js - particles - random</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			a {
+				color:#0078ff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="js/Three.js"></script>
+		<script src="js/geometry/primitives/Plane.js"></script>
+		<script src="js/Functions.js"></script>
+
+		<script src="js/Stats.js"></script>
+		<script src="js/SnowballView.js"></script>
+
+		<script>
+
+			var stats,
+				container, 
+				snowView;
+
+			init();
+		
+			function init() {
+				
+				snowView = new SnowballView(800, 600); // *********
+				
+				snowView.fireCallback = function(user, velocity) {   // ********
+					console.log(user, velocity.x, velocity.y, velocity.z);
+					snowView.makeSnowBall(user, velocity);
+				}
+				
+				
+				container = document.createElement('div');
+				document.body.appendChild(container);
+					
+				container.appendChild( snowView.renderer.domElement ); // *****
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+			}
+
+			//
+
+		
+
+			//
+
+		
+			
+			
+	
+			
+
+		</script>
+	</body>
+</html>
