@@ -4,7 +4,7 @@
 		<title>three.js - particles - random</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
-		<style type="text/css">
+		<style>
 			body {
 				background-color: #000000;
 				margin: 0px;
@@ -18,39 +18,38 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="js/Three.js"></script>
-		<script type="text/javascript" src="js/geometry/primitives/Plane.js"></script>
-		<script type="text/javascript" src="js/Functions.js"></script>
+		<script src="js/Three.js"></script>
+		<script src="js/geometry/primitives/Plane.js"></script>
+		<script src="js/Functions.js"></script>
 
-		<script type="text/javascript" src="js/Particle3D.js"></script>
+		<script src="js/Particle3D.js"></script>
 
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight;
+			var SCREEN_WIDTH = window.innerWidth,
+				SCREEN_HEIGHT = window.innerHeight,
 
-			var stats;
-			var container;
+				stats,
+				container,
 
-			var snowBalls = new Array();
-			var spareSnowBalls = new Array(); 
+				snowBalls = [],
+				spareSnowBalls = [], 
 
-			var camera;
-			var scene;
-			var renderer;
+				camera,
+				scene,
+				renderer,
 
-			var mouseX = 0;
-			var mouseY = 0;
+				mouseX = 0,
+				mouseY = 0,
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+				windowHalfX = window.innerWidth / 2,
+				windowHalfY = window.innerHeight / 2,
 
-			particleImage = new Image();
+				particleImage = new Image();
+						
 			particleImage.src = 'img/ParticleSmoke.png'; 
-
-
 
 			init();
 			setInterval( loop, 1000 / 60 );
@@ -62,19 +61,21 @@
 
 				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.z = 500;
+				camera.target.position.y = -60; 
 
 				scene = new THREE.Scene();
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-				var pos = new THREE.Vector3(500,-80,0);
+				var pos = new THREE.Vector3(500,-160,0);
+				
+				var numPlayers = 10; 
 
-
-				for (var i = 0; i < 10; i++) {
+				for (var i = 0; i < numPlayers; i++) {
 					
 					//var geometry = new Plane( 50, 70, 1, 1 );
-					var plane = new THREE.Mesh( new Plane( 50, 70 ), new THREE.MeshColorFillMaterial( 0xe0e0e0 ) );
+					var plane = new THREE.Mesh( new Plane( 50, 80 ), new THREE.MeshColorFillMaterial( 0xe00000 ) );
 					
 					
 					//particle = new Particle3D(  );
@@ -82,10 +83,10 @@
 					plane.position.y = pos.y;
 					plane.position.z = pos.z;
 					
-					plane.rotation.y = ((i*36)-90) * TO_RADIANS;
+					plane.rotation.y = ((i*(360/numPlayers))-90) * TO_RADIANS;
 					scene.addObject( plane );
 						
-					pos.rotateY(360/10); 
+					pos.rotateY(360/numPlayers); 
 				}
 
 				container.appendChild( renderer.domElement );
@@ -142,15 +143,16 @@
 
 			function loop() {
 
-				camera.target.position.x = ( mouseX) * 0.2;
+				camera.target.position.x = ( mouseX) * 0.4;
 				//camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 				
 				for(var i = 0; i<snowBalls.length; i++)
 				{
 					var snowball = snowBalls[i];
-					if(!snowball.enabled) continue; 
 					
 					snowball.update(); 
+					
+					if(!snowball.enabled) continue; 
 					
 					if(snowball.position.y < -200)
 					{
@@ -173,7 +175,7 @@
 				var snowball ; 
 			
 				if(spareSnowBalls.length>20){
-					snowball = spareSnowBalls.pop(); 
+					snowball = spareSnowBalls.shift(); 
 				} else {
 					snowball = new SnowBall();
 					snowBalls.push(snowball);
@@ -183,8 +185,8 @@
 				
 				
 				snowball.enabled = true; 
-				snowball.position.set(0,-40,200);
-				snowball.velocity.set(0,40,-40);
+				snowball.position.set(0,0,200);
+				snowball.velocity.set(0,0,-60);
 				snowball.velocity.rotateX(mouseY * 0.1);
 				snowball.velocity.rotateY(mouseX * -0.2);
 				

@@ -12,7 +12,7 @@ THREE.Vector3.prototype.rotateY = function(angle){
 	this.z= (tempx*-sinRY)+(tempz*cosRY);
 
 
-}
+};
 
 THREE.Vector3.prototype.rotateX = function(angle){
 					
@@ -26,7 +26,7 @@ THREE.Vector3.prototype.rotateX = function(angle){
 	this.z= (tempy*-sinRY)+(tempz*cosRY);
 
 
-}
+};
 
 
 
@@ -60,17 +60,40 @@ Particle3D.prototype.update = function() {
 
 // SnowBall class
 
-SnowBall = function () {
+SnowBall = function (particleImage) {
 	
 	Particle3D.call(this, new THREE.ParticleBitmapMaterial( particleImage )); 
 	
 	this.gravity.set(0,-1,0); 
 	this.drag = 0.99; 
 	
+	this.scale.x = this.scale.y = 0.5; //this.enabled ? 1 : 0.3; 
+	
 	
 }
 
 SnowBall.prototype = new Particle3D();
 SnowBall.prototype.constructor = SnowBall;
+
+SnowBall.prototype.update = function() { 
+
+	
+	if(this.enabled) 
+		Particle3D.prototype.update.call(this);
+	
+					
+
+}
+
+
+
+Player = function (index) {
+	
+}
+
+Player.prototype = new Plane3D(); 
+Player.prototype.constructor = Player; 
+
+
 
 
