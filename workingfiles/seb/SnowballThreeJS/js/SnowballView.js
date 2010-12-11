@@ -1,14 +1,18 @@
-
+var planeGeom = new Plane( 50, 80 );
 SnowballView = function (screenWidth, screenHeight) {
 	
 	this.fireCallback;
-	this.userID; 
+	
+	this.currentUser; 
+	
+	this.users = []; 
 	
 	this.SCREEN_WIDTH = screenWidth;
 	this.SCREEN_HEIGHT = screenHeight;
 
 	this.snowBalls = [];
 	this.spareSnowBalls = []; 
+	this.maxSnowBalls = 10; 
 
 	this.scene;
 	this.renderer;
@@ -18,60 +22,35 @@ SnowballView = function (screenWidth, screenHeight) {
 	
 	this.windowHalfX = this.SCREEN_WIDTH / 2,
 	this.windowHalfY = this.SCREEN_HEIGHT / 2,
-	
-
 
 	this.particleImage = new Image();
 				
 	this.particleImage.src = 'img/ParticleSmoke.png';
 	
 	this.camera = new THREE.Camera( 75, this.SCREEN_WIDTH / this.SCREEN_HEIGHT, 1, 10000 );
-	this.camera.position.y = 600;
-	this.camera.target.position.y = -60; 
-	this.camera.target.position.z = -10; 
-	
 
+	this.camera.position.y = 800;
+	// this.camera.target.position.y = -60; 
+	 this.camera.target.position.z = -1; 
+	
 	this.scene = new THREE.Scene();
 
 	this.renderer = new THREE.CanvasRenderer();
 	this.renderer.setSize(this.SCREEN_WIDTH, this.SCREEN_HEIGHT);
-	
-	
-	var pos = new THREE.Vector3(500,-80,0);
-		
-	var numPlayers = 10; 
-
-	for (var i = 0; i < numPlayers; i++) {
-		
-		//var geometry = new Plane( 50, 70, 1, 1 );
-		var plane = new THREE.Mesh( new Plane( 50, 80 ), new THREE.MeshColorFillMaterial(  (0xff * ((numPlayers-i)/numPlayers)) | ((0xff * (i/numPlayers)) <<16) ));
-		
-		
-		//particle = new Particle3D(  );
-		plane.position.x = pos.x;
-		plane.position.y = pos.y;
-		plane.position.z = pos.z;
-		
-		plane.rotation.y = ((i*(360/numPlayers))-90) * TO_RADIANS;
-		this.scene.addObject( plane );
-			
-		pos.rotateY(360/numPlayers); 
-	}
-
-
 
 	this.update = function () {
-		
-		for(var i = 0; i<this.snowBalls.length; i++){
+		//console.out("update");
+		for(var i = 0; i<this.snowBalls.length; i++) {
+			
 			var snowball = this.snowBalls[i];
 			
 			snowball.update(); 
 			
 			if(!snowball.enabled) continue; 
 			
-			if(snowball.position.y < -200){
+			if(snowball.position.y < 0){
 				
-				snowball.position.y = -200; 
+				snowball.position.y = 0; 
 				snowball.enabled = false; 
 				//scene.removeObject(snowball); 
 				this.spareSnowBalls.push(snowball); 
@@ -79,8 +58,16 @@ SnowballView = function (screenWidth, screenHeight) {
 		
 		}
 		
-	//	this.camera.target.position.x = ( mouseX) * 0.4;
-		this.renderer.render( this.scene, this.camera );
+		for(i = 0; i<this.users.length; i++) {
+			
+			var user = this.users[i];
+			user.update(); 
+			
+		}
+		
+		// this.camera.position.copy(this.currentUser.plane.position);
+		// 	this.camera.position.y+=40;
+	 	this.renderer.render( this.scene, this.camera );
 		
 		
 	};
@@ -92,11 +79,11 @@ SnowballView = function (screenWidth, screenHeight) {
 		v.rotateX(this.mouseY * 0.1);
 		v.rotateY(this.mouseX * -0.2);
 		
-		console.log(v);
+		//console.log(v);
 		
 		// call 
 		if (this.fireCallback) {
-			this.fireCallback(1, v); 
+			this.fireCallback(this.currentUser.slotNumber, v); 
 		}
 	}
 	
@@ -105,48 +92,106 @@ SnowballView = function (screenWidth, screenHeight) {
 	
 		var snowball; 
 
-		if(this.spareSnowBalls.length>20){
+		if(this.spareSnowBalls.length>this.maxSnowBalls){
 			snowball = this.spareSnowBalls.shift(); 
 		} else {
 			snowball = new SnowBall(this.particleImage);
 			this.snowBalls.push(snowball);
+			this.scene.addObject( snowball );
 		
 		}
 	
 		snowball.enabled = true;
 		
 		// set the position relative to the player!  
-		snowball.position.set(0,0,200);
+		var user = this.users[usernum];
+		//console.log("user",user, usernum);
+		snowball.position.copy(user.plane.position);
+		velocity.rotateY(user.currentRotation+90); 
 		snowball.velocity.set(velocity.x, velocity.y, velocity.z);
 		
-		this.scene.addObject( snowball );
+		
 	}
 	
-	this.setup = function (users, userid, slot)
+	this.setup = function (userlist, currentplayerid)
 	{
-		this.userID = userid; 
+		this.userID = currentplayerid; 
+		this.users = [];
 		
 		// iterate through each user and make a visual user object for each one. 
+	
+		var numPlayers = userlist.length;
 		
-		for(var i = 0; i<users.length; i++)
+		for(var i = 0; i<numPlayers; i++)
 		{
-			var user = users[i]; 
-			// do stuff... 
+			var userlistitem = userlist[i]; 
+			
+			var user = new UserView(userlistitem._id, i);
+			
+			// Create a plane object add it  
+			
+			if(user.id == this.userID) {
+				this.currentUser = user; 
+				//user.plane = new THREE.Mesh( new Plane( 50, 80 ), new THREE.MeshColorFillMaterial(0xffffff));
+				user.plane.material[0].color.setHex(0xffffffff);
+				//console.log(user.plane.material[0].color);
+				
+			}
+			
+			this.scene.addObject( user.plane );
+
+			user.updatePosition(numPlayers); 
+			user.update(true);
+
+			this.users.push(user);
+		
 			
 		}
-		
+
 		// update positions of everything.. 
 		// this.updatePositions(); 
 		
 	}
 	
-	this.updatePlayers = function (users )
+	this.updatePlayers = function (userlist )
 	{
-		for(var i = 0; i<users.length; i++)
+		for (var i =0 ; i<this.users.length; i++) {
+			this.scene.removeObject(this.users[i].plane)
+		}
+		var oldusers = this.users; 
+		this.users = [];
+		for(var i = 0; i<userlist.length; i++)
 		{
-			var user = users[i]; 
+			var userlistitem = userlist[i];
+			var user = undefined; 
+			
+			for(var j =0; j<oldusers.length; j++)
+			{
+				if(oldusers[j].id == userlistitem._id)
+				{
+					
+					user = oldusers[j];
+					
+				}
+			} 
+			
+			if(!user)
+			{
+				user = new UserView(userlistitem._id, i);
+				user.currentRotation = 360; 
+			
+				//console.log("MAKING NEW USER", user);	
+			}
+			
+			user.slotNumber = i; 
+			
+			this.scene.addObject(user.plane); 
+			user.updatePosition(userlist.length);
+			user.update(true);
+			this.users.push(user);
 			// do stuff... 
 			// compare with current user array. 
+			
 			
 		}
 		
@@ -160,51 +205,59 @@ SnowballView = function (screenWidth, screenHeight) {
 		this.mouseY = y - this.windowHalfY;
 	}
 	
+	
 		
 };
 
-document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-document.addEventListener( 'touchmove', onDocumentTouchMove, false );
-
-setInterval( loop, 1000 / 60 );
-
-
-function onDocumentMouseDown(event) {
-
-	snowView.throwSnowBall(); 
-
-}
-
-function onDocumentMouseMove ( event ) {
-
-	snowView.setMouse(event.clientX, event.clientY);
-
-}
-
-function onDocumentTouchStart ( event ) {
-
-	if ( event.touches.length == 1 ) {
+UserView = function (id, slot)
+{
+	this.id = id;
+	this.slotNumber = slot; 
 	
-		event.preventDefault();
-		snowView.setMouse(event.touches[ 0 ].pageX, event.touches[ 0 ].pageY);
+	this.currentRotation = 0; 
+	this.targetRotation = 0; 
+	this.radius = 500; // distance from the centre of the circle. 
+	this.tempVector = new THREE.Vector3(0,0,0);
 	
-	}
-}
-
-function onDocumentTouchMove ( event ) {
-
-	if ( event.touches.length == 1 ) {
+	var col = Math.random(); 
+	this.plane = new THREE.Mesh( planeGeom, new THREE.MeshBasicMaterial( { color:  (0xff * (col) | (0xff * (1-col) <<16) )} ));
+	this.plane.doubleSided = true; 
+	
+	this.update = function (forceRefresh) {
 		
-		event.preventDefault();
-		snowView.setMouse(event.touches[ 0 ].pageX, event.touches[ 0 ].pageY);
+		//this.plane.rotation.x+=0.01; 
+		if((forceRefresh) || (this.currentRotation!=this.targetRotation)) {
+		
+			var diff = this.targetRotation-this.currentRotation; 
+			
+			if (Math.abs(diff)<0.01) {
+				
+				this.currentRotation = this.targetRotation;
+				
+			} else {
+
+				diff*=0.1; 
+				this.currentRotation+=diff; 
+				
+			}
+	
+		
+			if(this.plane) {
+				this.tempVector.set(this.radius, 40, 0);
+				this.tempVector.rotateY(this.currentRotation); 
+			
+				this.plane.position.copy(this.tempVector);
+				this.plane.rotation.y = (this.currentRotation-90) * TO_RADIANS;
+			
+			}
+		}
+	}
+	
+	this.updatePosition = function (numPlayers){
+		
+		 this.targetRotation = (360/numPlayers)*this.slotNumber;
+		
 		
 	}
-}	
-function loop() {
 	
-	snowView.update()
-
-	stats.update();
 }
