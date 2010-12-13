@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>js/Functions.js</string>
+	<string>js/SnowballView.js</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -56,14 +56,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>3</integer>
+				<integer>36</integer>
 				<key>line</key>
-				<integer>103</integer>
+				<integer>71</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
-			<integer>0</integer>
+			<integer>129</integer>
 			<key>firstVisibleLine</key>
-			<integer>39</integer>
+			<integer>43</integer>
 		</dict>
 		<key>js/Functions.js</key>
 		<dict>
@@ -72,42 +72,28 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>87</integer>
+				<integer>3</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>64</integer>
-		</dict>
-		<key>js/Particle3D.js</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>0</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>3</integer>
 		</dict>
 		<key>js/SnowballView.js</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>48</integer>
 				<key>line</key>
-				<integer>8</integer>
+				<integer>151</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>130</integer>
 		</dict>
-		<key>js/geometry/primitives/Cylinder.js</key>
+		<key>js/geometry/primitives/Plane.js</key>
 		<dict>
 			<key>caret</key>
 			<dict>
@@ -119,21 +105,20 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>18</integer>
 		</dict>
 	</dict>
 	<key>openDocuments</key>
 	<array>
 		<string>SnowballThree2.html</string>
 		<string>SnowballThree1.html</string>
-		<string>js/Particle3D.js</string>
-		<string>js/geometry/primitives/Cylinder.js</string>
 		<string>js/SnowballView.js</string>
+		<string>js/geometry/primitives/Plane.js</string>
 		<string>js/Functions.js</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{282, 196}, {978, 682}}</string>
+	<string>{{251, 196}, {978, 682}}</string>
 </dict>
 </plist>

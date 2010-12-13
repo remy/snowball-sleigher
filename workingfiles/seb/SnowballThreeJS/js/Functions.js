@@ -62,7 +62,7 @@ Particle3D.prototype.update = function() {
 
 SnowBall = function (particleImage) {
 	
-	Particle3D.call(this, new THREE.ParticleBitmapMaterial( particleImage )); 
+	Particle3D.call(this, new THREE.ParticleBasicMaterial( {color:0xffffff, map:particleImage} ));// {}
 	
 	this.gravity.set(0,-1,0); 
 	this.drag = 0.99; 
@@ -81,8 +81,6 @@ SnowBall.prototype.update = function() {
 	if(this.enabled) 
 		Particle3D.prototype.update.call(this);
 	
-					
-
 }
 
 

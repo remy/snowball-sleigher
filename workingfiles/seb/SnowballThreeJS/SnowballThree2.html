@@ -19,7 +19,8 @@
 	<body>
 
 		<script src="js/Three.js"></script>
-		<script src="js/geometry/primitives/Plane.js"></script>
+		<script src="js/ThreeExtras.js"></script>
+		
 		<script src="js/Functions.js"></script>
 
 		<script src="js/Stats.js"></script>
@@ -30,41 +31,112 @@
 			var stats,
 				container, 
 				snowView;
-
+				
+			var userlistorig = [{"_id":"FROxIyL9Gdizob834P3EaVk5mhAGeBWp"},{"_id":"eBsijKbrzsEUQ6BDfy0BtJBDRUiUXDXl"},{"_id":"KCtmCP81iFsbAnooThme4k9M7tNOs4Xl"},{"_id":"kOqjiJJHNCGc3ssNk03m8yZgdgEHdTZm"},{"_id":"g8lZRKeW2rMCiTkF0r2l9d7V5i3lMJwV"},{"_id":"6z8mnU8CpxGEVAQUNkVZxxy1IZtFMsvy"},{"_id":"slCdeacxRudoEN4PxOY3PipmZXZ3OXPb"},{"_id":"hNVNKsz67s2GI0Dk0MwPDas9qwjP4zw6"}];
+			var currentUser; 
+			
+			var userlist = userlistorig.slice(); // clones the array
+			
 			init();
-		
+			setInterval( loop, 1000 / 60 );
+
 			function init() {
 				
-				snowView = new SnowballView(800, 600); // *********
+				snowView = new SnowballView(800, 600);
+				snowView.fireCallback = fireSnowBall;
+				//(user, velocity) {
+					
+				//}
+				currentUser = Math.floor( Math.random() * userlist.length ); 
 				
-				snowView.fireCallback = function(user, velocity) {   // ********
-					console.log(user, velocity.x, velocity.y, velocity.z);
-					snowView.makeSnowBall(user, velocity);
-				}
-				
+				snowView.setup(userlist, userlist[currentUser]._id); 
 				
 				container = document.createElement('div');
 				document.body.appendChild(container);
 					
-				container.appendChild( snowView.renderer.domElement ); // *****
+				container.appendChild( snowView.renderer.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
+				
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+				
+				setInterval( fireRandomSnowBall, 100 );
+				setInterval( setRandomUsers, 2000 );
+				
 
 			}
 
-			//
 
-		
+			function fireRandomSnowBall() {
+				
+				var usernumber = Math.floor(Math.random() * 7);
+				var	v = new THREE.Vector3(0,0,-60);
 
-			//
-
-		
+				v.rotateX((Math.random()*80) -40);
+				v.rotateY((Math.random()*75) );
+				
+				var userindex = Math.floor( Math.random() * userlist.length ); 
+				
+				if(userindex!=currentUser) fireSnowBall(userindex, v); 
+			//	console.log(userindex, v);
 			
+				
+				
+			}
+
+			function setRandomUsers() {
+				
+				
+				if((Math.random()<0.5) && (userlist.length<12))
+				{
+					userlist.push({_id:(Math.random()*10000000).toString()})
+					
+				} else {
+					
+					var userindex = Math.floor( Math.random() * userlist.length ); 
+				
+					if(userindex!=currentUser) {
+						//console.log(userlist);
+						userlist.splice(userindex,1);
+					
+					}
+				}
+				
+				snowView.updatePlayers(this.userlist); 
+				currentUser = snowView.currentUser.slotNumber;
+				
+			}
+
+			function fireSnowBall(user, velocity)
+			{
+				
+				//console.log(user, velocity.x, velocity.y, velocity.z);
+				snowView.makeSnowBall(user, velocity);
+			}
+
+			function loop() {
+				
+				snowView.update()
+
+				stats.update();
+			}
 			
-	
+			function onDocumentMouseDown (event) {
+
+				snowView.throwSnowBall(); 
+
+			}
+
+			function onDocumentMouseMove ( event ) {
+
+				snowView.setMouse(event.clientX, event.clientY);
+
+			}
+
 			
 
 		</script>
