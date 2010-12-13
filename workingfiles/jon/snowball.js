@@ -1,4 +1,4 @@
-// Debug Stuffs
+// Debug Helpers
 forbind.debug = true;
 var output = document.getElementById('out'),
     log = function (s) {
@@ -8,59 +8,24 @@ var output = document.getElementById('out'),
         output.appendChild(item);
       }
     };
-    
-// Simulation Stuffs - simulate game events for testing 
-document.onkeypress = function (event) {
-  console.log(event);
-  switch (event.charCode) {
-    case 115: // (S)nowball Fired
-
-      // This would be used by Seb's game world when the user fires a snowball.
-      ev(document).fire('snowball', {
-        slot: player, //TODO: This would be the players lot number.
-        vector: {
-          x: ~~(Math.random() * 101),
-          y: ~~(Math.random() * 101),
-          z: ~~(Math.random() * 101)
-        }
-      });
-
-      break;
-    case 106: // (J)oin
-      forbind.join();
-      break;
-    case 108: // (L)eave
-      forbind.leave();
-      break;
-    case 97: // (A)vatar changed
-
-      // This would be used by Remy after a avatar has been loaded and resized
-      ev(document).fire('avatar', {
-        slot: player,
-        imageData: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAIAAAACUFjqAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAALEgAACxIB0t1+/AAAAAd0SU1FB9EFBAoYMhVvMQIAAAAtSURBVHicY/z//z8DHoBH+v///yy4FDEyMjIwMDDhM3lgpaEuh7gTEzDiDxYA9HEPDF90e5YAAAAASUVORK5CYII='
-      });
-
-      break;
-  }
-};   
-    
 
 // Snowball Sleigher
     
 var player;
-
 forbind.on({
   join: function (event) {
     if (event.isme) {
-      player = event.slot;
+      player = event.user._id;
+      console.log(event.users);
+      init(event.users, player);
       log('You joined the fight as Player ' + player); // event.users: array
     } else {
-      log('Player ' + event.slot + ' joined the fight'); // event.user: object
+      console.log(event);
+      log('Player ' + event.user._id + ' joined the fight'); // event.user: object
     }
   },
   ready: function () {
     log('Snowball Fight! (session ready)');
-    fight();
   },
   leave: function (event) {
     log('> ' + event.user + ' left. ' + event.total + ' users remaining');
@@ -74,19 +39,21 @@ ev(document).on('snowball', function (event) {
   //slot
   //vector {x, y, z}
   
-  // Seb's Magic here instead of this silly text game
+  // Sebs function
+  console.log(event);
+  snowView.makeSnowBall(event.data.playerID, event.data.vector);
 
   if (event.data.slot == player) {
     forbind.send({
       type: 'snowball',
-      slot: event.data.slot,
+      playerID: event.data.playerID,
       vector: event.data.vector
     });
 //}
 // The below is just for debugging    
     log('You fired a snowball going ' + JSON.stringify(event.data.vector));
   } else {
-    log('Player ' + event.data.slot + ' fired a snowball going ' + JSON.stringify(event.data.vector));
+    log('Player ' + event.data.playerID + ' fired a snowball going ' + JSON.stringify(event.data.vector));
   }
 });
 ev(document).on('avatar', function (event) {
@@ -95,7 +62,7 @@ ev(document).on('avatar', function (event) {
   
   // Seb's Magic Here
   
-  if (event.data.slot == player) {
+  if (event.data.playerID == player) {
     forbind.send({
       type: 'avatar',
       data: event.data.imageData
@@ -104,6 +71,43 @@ ev(document).on('avatar', function (event) {
 // The below is just for debugging
     log('You updated your avatar to <img src="' + event.data.imageData + '"/>');
   } else {
-    log('Player ' + event.data.slot + ' updated their avatar to <img src="' + event.data.imageData + '"/>');
+    log('Player ' + event.data.playerID + ' updated their avatar to <img src="' + event.data.imageData + '"/>');
   }
 });
+
+
+
+
+
+var snowView;
+var init =  function (allPlayersIDs, currentPlayerID) {
+  
+  snowView = new SnowballView(800, 600);
+	
+	snowView.setup(allPlayersIDs, currentPlayerID); 
+	
+	snowView.fireCallback = function(playerID, velocity) {
+    ev(document).fire('snowball', {
+      player: playerID,
+      vector: velocity
+    });
+  };
+	
+	document.getElementById('container').appendChild(snowView.renderer.domElement);
+	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+  document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+  
+  setInterval(loop, 1000 / 60 );
+  
+  function onDocumentMouseDown(event) {
+  	snowView.throwSnowBall(); 
+  }
+  function onDocumentMouseMove ( event ) {
+  	snowView.setMouse(event.clientX, event.clientY);
+  }
+  function loop() {
+  	snowView.update()
+  }
+};
+
+forbind.join();
