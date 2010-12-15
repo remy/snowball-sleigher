@@ -21,6 +21,7 @@ forbind.on({
       log('You joined the fight as Player ' + player); // event.users: array
     } else {
       console.log(event);
+      snowView.updatePlayers(this.userlist);
       log('Player ' + event.user._id + ' joined the fight'); // event.user: object
     }
   },
@@ -28,6 +29,7 @@ forbind.on({
     log('Snowball Fight! (session ready)');
   },
   leave: function (event) {
+    snowView.updatePlayers(this.userlist);
     log('> ' + event.user + ' left. ' + event.total + ' users remaining');
   },
   message: function (event) {
@@ -40,13 +42,13 @@ ev(document).on('snowball', function (event) {
   //vector {x, y, z}
   
   // Sebs function
-  console.log(event);
-  snowView.makeSnowBall(event.data.playerID, event.data.vector);
+  snowView.makeSnowBall(event.data.slot, event.data.vector);
 
-  if (event.data.slot == player) {
+  if (event.data.playerID == player) {
     forbind.send({
       type: 'snowball',
       playerID: event.data.playerID,
+      slot: event.data.slot,
       vector: event.data.vector
     });
 //}
@@ -56,24 +58,24 @@ ev(document).on('snowball', function (event) {
     log('Player ' + event.data.playerID + ' fired a snowball going ' + JSON.stringify(event.data.vector));
   }
 });
-ev(document).on('avatar', function (event) {
-  //slot
-  //imageData base64
-  
-  // Seb's Magic Here
-  
-  if (event.data.playerID == player) {
-    forbind.send({
-      type: 'avatar',
-      data: event.data.imageData
-    });
-//}
-// The below is just for debugging
-    log('You updated your avatar to <img src="' + event.data.imageData + '"/>');
-  } else {
-    log('Player ' + event.data.playerID + ' updated their avatar to <img src="' + event.data.imageData + '"/>');
-  }
-});
+// ev(document).on('avatar', function (event) {
+//   //slot
+//   //imageData base64
+//   
+//   // Seb's Magic Here
+//   
+//   if (event.data.playerID == player) {
+//     forbind.send({
+//       type: 'avatar',
+//       data: event.data.imageData
+//     });
+// //}
+// // The below is just for debugging
+//     log('You updated your avatar to <img src="' + event.data.imageData + '"/>');
+//   } else {
+//     log('Player ' + event.data.playerID + ' updated their avatar to <img src="' + event.data.imageData + '"/>');
+//   }
+// });
 
 
 
@@ -86,9 +88,10 @@ var init =  function (allPlayersIDs, currentPlayerID) {
 	
 	snowView.setup(allPlayersIDs, currentPlayerID); 
 	
-	snowView.fireCallback = function(playerID, velocity) {
+	snowView.fireCallback = function(playerID, slot, velocity) {
     ev(document).fire('snowball', {
-      player: playerID,
+      playerID: playerID,
+      slot: slot,
       vector: velocity
     });
   };

@@ -83,14 +83,14 @@ SnowballView = function (screenWidth, screenHeight) {
 		
 		// call 
 		if (this.fireCallback) {
-			this.fireCallback(this.currentUser.slotNumber, v); 
+		  this.fireCallback(this.currentUser.id, this.currentUser.slotNumber, v); 
 		}
 	}
 	
 	
 	this.makeSnowBall = function (usernum, velocity) {
 	
-		var snowball; 
+		var snowball;
 
 		if(this.spareSnowBalls.length>this.maxSnowBalls){
 			snowball = this.spareSnowBalls.shift(); 
@@ -105,9 +105,13 @@ SnowballView = function (screenWidth, screenHeight) {
 		
 		// set the position relative to the player!  
 		var user = this.users[usernum];
-		//console.log("user",user, usernum);
+		console.log("user",user, usernum);
+		console.log(velocity, snowball);
 		snowball.position.copy(user.plane.position);
-		velocity.rotateY(user.currentRotation+90); 
+		//velocity.rotateY(user.currentRotation+90);
+		console.log(THREE);
+		v = new THREE.Vector3(0,0,-60);
+		v.rotateY.call(velocity, user.currentRotation+90);
 		snowball.velocity.set(velocity.x, velocity.y, velocity.z);
 		
 		
